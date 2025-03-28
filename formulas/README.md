@@ -1,84 +1,84 @@
-# Fórmulas Matemáticas del Calculador de Préstamos UVA
+# Formulas Matematicas del Calculador de Prestamos UVA
 
-Esta sección documenta en detalle todas las fórmulas financieras utilizadas en el Calculador de Préstamos UVA. Cada fórmula está explicada con su base matemática, significado de variables, y diagramas ilustrativos.
+Esta seccion documenta en detalle todas las formulas financieras utilizadas en el Calculador de Prestamos UVA. Cada formula esta explicada con su base matematica, significado de variables, y diagramas ilustrativos.
 
-## Índice de Fórmulas
+## Indice de Formulas
 
-1. [Cálculo de Cuota Mensual](#cálculo-de-cuota-mensual)
-2. [Cálculo de Monto Máximo de Préstamo](#cálculo-de-monto-máximo-de-préstamo)
-3. [Cálculo de Tasa Efectiva Anual (TEA)](#cálculo-de-tasa-efectiva-anual-tea)
-4. [Cálculo de CFTEA](#cálculo-de-cftea)
-5. [Generación de Amortización](#generación-de-amortización)
-6. [Evolución del Capital](#evolución-del-capital)
-7. [Composición de Pagos](#composición-de-pagos)
-8. [Cálculo de Plazo Máximo](#cálculo-de-plazo-máximo)
+1. [Calculo de Cuota Mensual](#calculo-de-cuota-mensual)
+2. [Calculo de Monto Maximo de Prestamo](#calculo-de-monto-maximo-de-prestamo)
+3. [Calculo de Tasa Efectiva Anual (TEA)](#calculo-de-tasa-efectiva-anual-tea)
+4. [Calculo de CFTEA](#calculo-de-cftea)
+5. [Generacion de Amortizacion](#generacion-de-amortizacion)
+6. [Evolucion del Capital](#evolucion-del-capital)
+7. [Composicion de Pagos](#composicion-de-pagos)
+8. [Calculo de Plazo Maximo](#calculo-de-plazo-maximo)
 
-## Cálculo de Cuota Mensual
+## Calculo de Cuota Mensual
 
-La cuota mensual es calculada usando la fórmula estándar de amortización para préstamos de cuota fija:
+La cuota mensual es calculada usando la formula estandar de amortizacion para prestamos de cuota fija:
 
 ```mermaid
 graph TD
-    A[PMT = P * r * (1 + r)^n / ((1 + r)^n - 1)] --> B[PMT: Cuota Mensual]
-    A --> C[P: Monto del Préstamo]
-    A --> D[r: Tasa de Interés Mensual]
-    A --> E[n: Número Total de Pagos]
+    A["PMT = $P \times r \times \frac{(1 + r)^n}{(1 + r)^n - 1}$"] --> B["PMT: Cuota Mensual"]
+    A --> C["P: Monto del Prestamo"]
+    A --> D["r: Tasa de Interes Mensual"]
+    A --> E["n: Numero Total de Pagos"]
 ```
 
 **Variables:**
 - **PMT** = Cuota mensual
-- **P** = Monto del préstamo
-- **r** = Tasa de interés mensual (TNA / 12 / 100)
-- **n** = Número total de pagos (años * 12)
+- **P** = Monto del prestamo
+- **r** = Tasa de interes mensual (TNA / 12 / 100)
+- **n** = Numero total de pagos (años * 12)
 
-**Implementación en el código:**
+**Implementacion en el codigo:**
 ```javascript
 const monthlyPayment =
   (loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, totalPayments))) /
   (Math.pow(1 + monthlyRate, totalPayments) - 1);
 ```
 
-**Flujo de cálculo:**
+**Flujo de calculo:**
 
 ```mermaid
 flowchart LR
-    A[Monto Préstamo] --> D[Cuota Mensual]
+    A[Monto Prestamo] --> D[Cuota Mensual]
     B[Tasa Mensual] --> D
     C[Total Pagos] --> D
-    D -->|Conversión| E[Cuota en UVAs]
+    D -->|Conversion| E[Cuota en UVAs]
     F[Valor UVA] --> E
 ```
 
-## Cálculo de Monto Máximo de Préstamo
+## Calculo de Monto Maximo de Prestamo
 
-El monto máximo del préstamo se calcula en función de dos restricciones:
+El monto maximo del prestamo se calcula en funcion de dos restricciones:
 
 1. **Por valor de propiedad**: Un porcentaje del valor de la propiedad
-2. **Por ingreso mensual**: El máximo que permite la cuota según el ingreso
+2. **Por ingreso mensual**: El maximo que permite la cuota segun el ingreso
 
 ```mermaid
 graph TD
-    A[Restricciones de Monto Máximo] --> B[Por Valor de Propiedad]
+    A[Restricciones de Monto Maximo] --> B[Por Valor de Propiedad]
     A --> C[Por Ingreso Mensual]
-    B --> D[maxLoanByProperty = propertyValue * financingPercentage]
-    C --> E[maxLoanByIncome = PMT * ((1 - (1 + r)^-n) / r)]
-    D --> F{Mínimo?}
+    B --> D["maxLoanByProperty = propertyValue × financingPercentage"]
+    C --> E["maxLoanByIncome = PMT × $\frac{1 - (1 + r)^{-n}}{r}$"]
+    D --> F{Minimo?}
     E --> F
-    F --> G[loanAmount = min(maxLoanByProperty, maxLoanByIncome)]
+    F --> G["loanAmount = min(maxLoanByProperty, maxLoanByIncome)"]
 ```
 
 **Variables para monto por propiedad:**
-- **maxLoanByProperty** = Monto máximo por valor de propiedad
+- **maxLoanByProperty** = Monto maximo por valor de propiedad
 - **propertyValue** = Valor de la propiedad
-- **financingPercentage** = Porcentaje de financiación (80% o 50%)
+- **financingPercentage** = Porcentaje de financiacion (80% o 50%)
 
 **Variables para monto por ingreso:**
-- **maxLoanByIncome** = Monto máximo por ingreso
-- **maxMonthlyPayment** = Pago mensual máximo (25% del ingreso)
-- **r** = Tasa de interés mensual
-- **n** = Número total de pagos
+- **maxLoanByIncome** = Monto maximo por ingreso
+- **maxMonthlyPayment** = Pago mensual maximo (25% del ingreso)
+- **r** = Tasa de interes mensual
+- **n** = Numero total de pagos
 
-**Implementación en el código:**
+**Implementacion en el codigo:**
 ```javascript
 // Por valor de propiedad
 const financingPercentage = housingType === "permanent" ? 0.8 : 0.5;
@@ -89,21 +89,21 @@ const maxMonthlyPayment = monthlyIncome * INCOME_RATIO;
 const maxLoanByIncome = maxMonthlyPayment *
   ((1 - Math.pow(1 + monthlyRate, -totalPayments)) / monthlyRate);
 
-// Monto final del préstamo
+// Monto final del prestamo
 const loanAmount = Math.min(maxLoanByProperty, maxLoanByIncome);
 ```
 
-**Diagrama de decisión:**
+**Diagrama de decision:**
 
 ```mermaid
 flowchart TD
     A[Inicio] --> B{Tipo de Vivienda?}
-    B -->|Permanente| C[Financiación: 80%]
-    B -->|No Permanente| D[Financiación: 50%]
+    B -->|Permanente| C[Financiacion: 80%]
+    B -->|No Permanente| D[Financiacion: 50%]
     C --> E[maxLoanByProperty]
     D --> E
 
-    F[Ingreso Mensual] --> G[Máx Cuota: 25% ingreso]
+    F[Ingreso Mensual] --> G[Max Cuota: 25% ingreso]
     G --> H[maxLoanByIncome]
 
     E --> I{Comparar Montos}
@@ -111,50 +111,50 @@ flowchart TD
     I -->|Limitado por Propiedad| J[Usar maxLoanByProperty]
     I -->|Limitado por Ingreso| K[Usar maxLoanByIncome]
 
-    J --> L[Monto Final Préstamo]
+    J --> L[Monto Final Prestamo]
     K --> L
 ```
 
-## Cálculo de Tasa Efectiva Anual (TEA)
+## Calculo de Tasa Efectiva Anual (TEA)
 
 La Tasa Efectiva Anual se calcula a partir de la Tasa Nominal Anual (TNA):
 
 ```mermaid
 graph LR
-    A[TEA = (1 + TNA/12/100)^12 - 1] --> B[Convertir a porcentaje: TEA * 100]
+    A["TEA = $(1 + \frac{TNA}{12 \times 100})^{12} - 1$"] --> B["Convertir a porcentaje: TEA × 100"]
 ```
 
 **Variables:**
 - **TEA** = Tasa Efectiva Anual
-- **TNA** = Tasa Nominal Anual (9.5% en el código)
+- **TNA** = Tasa Nominal Anual (9.5% en el codigo)
 
-**Implementación en el código:**
+**Implementacion en el codigo:**
 ```javascript
 const tea = (Math.pow(1 + tna / 100 / 12, 12) - 1) * 100;
 ```
 
-## Cálculo de CFTEA
+## Calculo de CFTEA
 
 El Costo Financiero Total Efectivo Anual añade costos adicionales a la TEA:
 
 ```mermaid
 graph LR
-    A[CFTEA = TEA + costos adicionales] --> B[CFTEA = TEA + 0.19%]
+    A["CFTEA = TEA + costos_adicionales"] --> B["CFTEA = TEA + 0.19%"]
 ```
 
 **Variables:**
 - **CFTEA** = Costo Financiero Total Efectivo Anual
 - **TEA** = Tasa Efectiva Anual
-- **Costos adicionales** = 0.19% en el código
+- **Costos adicionales** = 0.19% en el codigo
 
-**Implementación en el código:**
+**Implementacion en el codigo:**
 ```javascript
 const cftea = tea + 0.19;
 ```
 
-## Generación de Amortización
+## Generacion de Amortizacion
 
-La tabla de amortización muestra cómo se distribuye cada pago entre interés y capital:
+La tabla de amortizacion muestra como se distribuye cada pago entre interes y capital:
 
 ```mermaid
 sequenceDiagram
@@ -164,7 +164,7 @@ sequenceDiagram
 
     I->>M: balance = loanAmount
     loop Para cada cuota
-        M->>M: interest = balance * monthlyRate
+        M->>M: interest = balance × monthlyRate
         M->>M: principal = monthlyPayment - interest
         M->>M: balance = balance - principal
         M->>F: Guardar {payment, monthlyPayment, interest, principal, balance}
@@ -172,13 +172,13 @@ sequenceDiagram
 ```
 
 **Variables:**
-- **balance** = Saldo pendiente del préstamo
-- **interest** = Interés de la cuota actual
+- **balance** = Saldo pendiente del prestamo
+- **interest** = Interes de la cuota actual
 - **principal** = Capital amortizado en la cuota actual
 - **monthlyPayment** = Cuota mensual
-- **monthlyRate** = Tasa de interés mensual
+- **monthlyRate** = Tasa de interes mensual
 
-**Implementación en el código:**
+**Implementacion en el codigo:**
 ```javascript
 const generateAmortizationSchedule = (
   loanAmount,
@@ -207,28 +207,28 @@ const generateAmortizationSchedule = (
 };
 ```
 
-## Evolución del Capital
+## Evolucion del Capital
 
-Este cálculo muestra cómo evoluciona el saldo pendiente a lo largo del préstamo:
+Este calculo muestra como evoluciona el saldo pendiente a lo largo del prestamo:
 
 ```mermaid
 graph TD
-    A[Evolución del Capital] --> B[Año 0: Saldo Inicial = 100%]
+    A[Evolucion del Capital] --> B[Año 0: Saldo Inicial = 100%]
     B --> C[Por cada año subsiguiente]
     C --> D[Calcular 12 cuotas mensuales]
     D --> E[Actualizar saldo pendiente]
     E --> F[Calcular porcentaje pendiente]
-    F --> G[Agregar a datos de evolución]
+    F --> G[Agregar a datos de evolucion]
 ```
 
 **Variables:**
-- **balance** = Saldo pendiente del préstamo
-- **interest** = Interés de cada cuota
+- **balance** = Saldo pendiente del prestamo
+- **interest** = Interes de cada cuota
 - **principal** = Capital amortizado en cada cuota
-- **year** = Año actual del préstamo
-- **percentage** = Porcentaje del préstamo pendiente
+- **year** = Año actual del prestamo
+- **percentage** = Porcentaje del prestamo pendiente
 
-**Implementación en el código:**
+**Implementacion en el codigo:**
 ```javascript
 const generateCapitalEvolutionData = (
   loanAmount,
@@ -274,22 +274,22 @@ flowchart TD
     B --> C{Recorrer años 1 a N}
     C --> D[Simular 12 cuotas mensuales]
     D --> E[Actualizar saldo balance]
-    E --> F[Calcular percentage = balance/loanAmount * 100]
-    F --> G[Agregar punto a la gráfica]
+    E --> F["Calcular percentage = balance/loanAmount × 100"]
+    F --> G[Agregar punto a la grafica]
     G --> C
-    C --> H[Fin: datos de evolución completos]
+    C --> H[Fin: datos de evolucion completos]
 ```
 
-## Composición de Pagos
+## Composicion de Pagos
 
-Este cálculo analiza cómo se distribuye cada cuota entre interés y capital a lo largo del tiempo:
+Este calculo analiza como se distribuye cada cuota entre interes y capital a lo largo del tiempo:
 
 ```mermaid
 graph TD
-    A[Composición de Pagos] --> B[Por cada año de muestra]
-    B --> C[Calcular interés y capital anual]
+    A[Composicion de Pagos] --> B[Por cada año de muestra]
+    B --> C[Calcular interes y capital anual]
     C --> D[Calcular porcentajes]
-    D --> E[Agregar a datos de composición]
+    D --> E[Agregar a datos de composicion]
 ```
 
 **Variables:**
@@ -298,7 +298,7 @@ graph TD
 - **interestPercentage** = Porcentaje de la cuota anual destinado a intereses
 - **principalPercentage** = Porcentaje de la cuota anual destinado a capital
 
-**Implementación en el código:**
+**Implementacion en el codigo:**
 ```javascript
 const generatePaymentCompositionData = (
   loanAmount,
@@ -350,27 +350,27 @@ flowchart TD
     F --> J[Calcular porcentajes interest/principal]
     J --> K[Agregar datos del año]
     K --> D
-    D --> L[Fin: datos de composición completos]
+    D --> L[Fin: datos de composicion completos]
 ```
 
-## Cálculo de Plazo Máximo
+## Calculo de Plazo Maximo
 
-El plazo máximo del préstamo se calcula en función de la edad del solicitante:
+El plazo maximo del prestamo se calcula en funcion de la edad del solicitante:
 
 ```mermaid
 graph TD
-    A[Plazo Máximo de Préstamo] --> B[maxYears = MAX_AGE_AT_COMPLETION - currentAge]
-    B --> C[Aplicar límite técnico: MAX_LOAN_TERM]
-    C --> D[maxLoanTerm = min(maxYears, MAX_LOAN_TERM)]
+    A[Plazo Maximo de Prestamo] --> B["maxYears = MAX_AGE_AT_COMPLETION - currentAge"]
+    B --> C[Aplicar limite tecnico: MAX_LOAN_TERM]
+    C --> D["maxLoanTerm = min(maxYears, MAX_LOAN_TERM)"]
 ```
 
 **Variables:**
-- **maxYears** = Años máximos basados en la edad
-- **MAX_AGE_AT_COMPLETION** = Edad máxima al finalizar el préstamo (70)
+- **maxYears** = Años maximos basados en la edad
+- **MAX_AGE_AT_COMPLETION** = Edad maxima al finalizar el prestamo (70)
 - **currentAge** = Edad actual del solicitante
-- **MAX_LOAN_TERM** = Plazo máximo técnico (30 años)
+- **MAX_LOAN_TERM** = Plazo maximo tecnico (30 años)
 
-**Implementación en el código:**
+**Implementacion en el codigo:**
 ```javascript
 const calculateMaxLoanTerm = (currentAge) => {
   const maxYears = MAX_AGE_AT_COMPLETION - currentAge;
@@ -378,20 +378,20 @@ const calculateMaxLoanTerm = (currentAge) => {
 };
 ```
 
-## Interrelación de Fórmulas
+## Interrelacion de Formulas
 
-Las fórmulas están interrelacionadas y se utilizan en conjunto para calcular el préstamo completo:
+Las formulas estan interrelacionadas y se utilizan en conjunto para calcular el prestamo completo:
 
 ```mermaid
 graph TD
-    A[Entradas Usuario] --> B[Validación]
-    B --> C[Cálculo Plazo Máximo]
-    C --> D[Cálculo Monto Máximo]
-    D --> E[Cálculo Cuota Mensual]
-    E --> F1[Tabla Amortización]
-    E --> F2[Evolución Capital]
-    E --> F3[Composición Pagos]
-    D --> G[Cálculo TEA/CFTEA]
+    A[Entradas Usuario] --> B[Validacion]
+    B --> C[Calculo Plazo Maximo]
+    C --> D[Calculo Monto Maximo]
+    D --> E[Calculo Cuota Mensual]
+    E --> F1[Tabla Amortizacion]
+    E --> F2[Evolucion Capital]
+    E --> F3[Composicion Pagos]
+    D --> G[Calculo TEA/CFTEA]
 ```
 
 **Ejemplo de flujo completo:**
@@ -406,10 +406,10 @@ sequenceDiagram
     U->>V: Ingresar datos
     V->>V: Validar edad, ingreso, plazo
     V->>C: Datos validados
-    C->>C: Calcular monto máximo
+    C->>C: Calcular monto maximo
     C->>C: Calcular cuota mensual
     C->>C: Calcular intereses
-    C->>C: Generar amortización
+    C->>C: Generar amortizacion
     C->>R: Mostrar resultados
     R->>U: Visualizaciones
 ```
